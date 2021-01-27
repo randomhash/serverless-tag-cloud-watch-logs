@@ -52,8 +52,10 @@ class ServerlessCloudWatchLogsTagPlugin {
         if (err) return reject(err);
         StackResources.push(...(data.StackResourceSummaries || []));
         if (data.NextToken) {
+          console.log('Starting fetching pages')
           let token = data.NextToken;
           while (token) {
+            console.log(token)
             this.cloudWatchLogsService.listStackResources({ StackName: this.stackName, NextToken: token }, (err, data) => {
               console.log(data);
               if (err) return reject(err);
