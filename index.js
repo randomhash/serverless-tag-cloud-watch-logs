@@ -54,8 +54,7 @@ class ServerlessCloudWatchLogsTagPlugin {
         this.resources.push(...(data.StackResourceSummaries || []));
         if (data.NextToken) {
           console.log('Starting fetching pages')
-          let token = data.NextToken;
-          return this.getStackResourceWithToken({ StackName: this.stackName, NextToken: token })
+          return this.getStackResourceWithToken(data.NextToken)
         }
       });
       return resolve(StackResources)
@@ -67,6 +66,10 @@ class ServerlessCloudWatchLogsTagPlugin {
       console.log('Executing listStackResources by token ', token);
       this.cloudWatchLogsService.listStackResources({ StackName: this.stackName, NextToken: token}, (err, data) => {
         console.log(data);
+        if (!data) {
+          console.log("No data to traverse");
+          return resolve(this.resources);
+        }
         if (err) return reject(err);
         this.resources.push(...(data.StackResourceSummaries || []));
         if (data.NextToken) {
