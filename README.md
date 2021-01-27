@@ -7,7 +7,7 @@ Serverless plugin to tag CloudWatchLogs
 Install the plugin via <a href="https://docs.npmjs.com/cli/install">NPM</a>
 
 ```
-npm install --save-dev sserverless-tag-cloud-watch-log-groups
+npm install --save-dev serverless-tag-cloud-watch-log-groups
 ```
 
 ## Usage
