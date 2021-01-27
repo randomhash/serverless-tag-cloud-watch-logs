@@ -1,6 +1,6 @@
 {
   "name": "serverless-tag-cloud-watch-log-groups",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Serverless plugin to tag CloudWatchLogs",
   "main": "index.js",
   "repository": {

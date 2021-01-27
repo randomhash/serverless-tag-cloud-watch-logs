@@ -46,19 +46,32 @@ class ServerlessCloudWatchLogsTagPlugin {
   getStackResources() {
     return new Promise((resolve, reject) => {
       console.log('Executing listStackResources');
-      this.cloudWatchLogsService.listStackResources({ StackName: this.stackName }, (err, data) => {
+      const StackResources = [];
+      this.cloudWatchLogsService.listStackResources({ StackName: this.stackName, MaxItems: 9999 }, (err, data) => {
         console.log(data);
         if (err) return reject(err);
-        resolve(data);
+        StackResources.push(...(data.StackResourceSummaries || []));
+        if (data.NextToken) {
+          let token = data.NextToken;
+          while (token) {
+            this.cloudWatchLogsService.listStackResources({ StackName: this.stackName, StartingToken: token }, (err, data) => {
+              console.log(data);
+              if (err) return reject(err);
+              StackResources.push(...(data.StackResourceSummaries || []));
+              token = data.NextToken || 0
+            })
+          }
+        }
       });
+      return resolve(StackResources)
     });
   }
 
   tagCloudWatchLogs(data) {
 
-    const cloudWatchResources = (data.StackResources || []).filter(item => { return item.ResourceType === 'AWS::Logs::LogGroup' });
+    const cloudWatchResources = (data.StackResourceSummaries || []).filter(item => { return item.ResourceType === 'AWS::Logs::LogGroup' });
 
-    const promises = (cloudWatchResources || []).map(item => {
+    const promises = (cloudWatchResources).map(item => {
       return new Promise((resolve, reject) => {
         console.log(item);
         const params = {
