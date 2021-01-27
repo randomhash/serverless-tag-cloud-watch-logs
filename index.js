@@ -49,36 +49,33 @@ class ServerlessCloudWatchLogsTagPlugin {
 
   getStackResources() {
     return new Promise((resolve, reject) => {
-      const StackResources = [];
-      this.cloudWatchLogsService.listStackResources({ StackName: this.stackName}, (err, data) => {
+      return this.cloudWatchLogsService.listStackResources({ StackName: this.stackName}, (err, data) => {
         console.log(data);
         if (err) return reject(err);
         this.resources.push(...(data.StackResourceSummaries || []));
         if (data.NextToken) {
           console.log('Starting fetching pages')
-          return this.getStackResourceWithToken(data.NextToken)
+          return this.getStackResourceWithToken(data.NextToken, resolve)
         }
+        return resolve()
       });
-      return resolve(StackResources)
     });
   }
 
-  getStackResourceWithToken(token)  {
-    return new Promise((resolve, reject) => {
+  getStackResourceWithToken(token, resolveParent)  {
       console.log('Executing listStackResources by token ', token);
       this.cloudWatchLogsService.listStackResources({ StackName: this.stackName, NextToken: token}, (err, data) => {
         if (!data) {
           console.log("No data to traverse");
-          resolve(this.resources);
+          resolveParent(this.resources);
         }
         if (err) return reject(err);
         this.resources.push(...(data.StackResourceSummaries || []));
         if (data.NextToken) {
-          return getStackResourceWithToken(data.NextToken);
+          return getStackResourceWithToken(data.NextToken, resolveParent);
         }
       });
-      resolve(this.resources)
-    });
+      resolveParent(this.resources)
   }
 
   tagCloudWatchLogs() {
