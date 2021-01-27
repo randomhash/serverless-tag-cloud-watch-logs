@@ -46,6 +46,7 @@ class ServerlessCloudWatchLogsTagPlugin {
   getStackResources() {
     return new Promise((resolve, reject) => {
       this.cloudWatchLogsService.listStackResources({ StackName: this.stackName }, (err, data) => {
+        console.log(data);
         if (err) return reject(err);
         resolve(data);
       });
@@ -58,7 +59,7 @@ class ServerlessCloudWatchLogsTagPlugin {
 
     const promises = (cloudWatchResources || []).map(item => {
       return new Promise((resolve, reject) => {
-
+        console.log(item);
         const params = {
           logGroupName: item.PhysicalResourceId,
           tags: this.serverless.service.custom.cloudWatchLogsTags
