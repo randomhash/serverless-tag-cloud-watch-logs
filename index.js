@@ -45,6 +45,7 @@ class ServerlessCloudWatchLogsTagPlugin {
 
   getStackResources() {
     return new Promise((resolve, reject) => {
+      console.log('Executing listStackResources');
       this.cloudWatchLogsService.listStackResources({ StackName: this.stackName }, (err, data) => {
         console.log(data);
         if (err) return reject(err);
