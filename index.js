@@ -40,7 +40,6 @@ class ServerlessCloudWatchLogsTagPlugin {
   execute() {
     return this.getStackResources()
       .then(() => {
-        console.log('Starting tag resources', this.resources);
         return this.tagCloudWatchLogs();
       })
       .then(data => this.serverless.cli.log(JSON.stringify(data)))
@@ -50,29 +49,27 @@ class ServerlessCloudWatchLogsTagPlugin {
   getStackResources() {
     return new Promise((resolve, reject) => {
       return this.cloudWatchLogsService.listStackResources({ StackName: this.stackName}, (err, data) => {
-        console.log(data);
         if (err) return reject(err);
         this.resources.push(...(data.StackResourceSummaries || []));
         if (data.NextToken) {
-          console.log('Starting fetching pages')
-          return this.getStackResourceWithToken(data.NextToken, resolve)
+          console.log('Starting fetching pages of resources...')
+          return this.getStackResourceWithToken(data.NextToken, resolve, reject)
         }
         return resolve()
       });
     });
   }
 
-  getStackResourceWithToken(token, resolveParent)  {
+  getStackResourceWithToken(token, resolveParent, rejectParent)  {
       console.log('Executing listStackResources by token ', token);
       this.cloudWatchLogsService.listStackResources({ StackName: this.stackName, NextToken: token}, (err, data) => {
         if (!data) {
-          console.log("No data to traverse");
           return resolveParent(this.resources);
         }
-        if (err) return reject(err);
+        if (err) return rejectParent(err);
         this.resources.push(...(data.StackResourceSummaries || []));
         if (data.NextToken) {
-          return getStackResourceWithToken(data.NextToken, resolveParent);
+          return getStackResourceWithToken(data.NextToken, resolveParent, rejectParent);
         }
         return resolveParent(this.resources)
       });
@@ -80,12 +77,9 @@ class ServerlessCloudWatchLogsTagPlugin {
 
   tagCloudWatchLogs() {
     const cloudWatchResources = this.resources.filter(item => { return item.ResourceType === 'AWS::Logs::LogGroup' });
-    console.log('Resulting value');
-    console.log(cloudWatchResources);
 
     const promises = cloudWatchResources.map(item => {
       return new Promise((resolve, reject) => {
-        console.log(item);
         const params = {
           logGroupName: item.PhysicalResourceId,
           tags: this.serverless.service.custom.cloudWatchLogsTags
@@ -98,10 +92,7 @@ class ServerlessCloudWatchLogsTagPlugin {
       });
     });
 
-    return Promise.all(promises).then((data) => {
-      console.log(data);
-      return data;
-    });
+    return Promise.all(promises);
   }
 }
 
