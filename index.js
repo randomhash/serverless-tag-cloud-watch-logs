@@ -39,7 +39,10 @@ class ServerlessCloudWatchLogsTagPlugin {
 
   execute() {
     return this.getStackResources()
-      .then(data => this.tagCloudWatchLogs(data))
+      .then(() => {
+        console.log('Starting tag resources', this.resources);
+        return this.tagCloudWatchLogs();
+      })
       .then(data => this.serverless.cli.log(JSON.stringify(data)))
       .catch(err => this.serverless.cli.log(JSON.stringify(err)));
   }
