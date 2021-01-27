@@ -1,7 +1,5 @@
 'use strict';
 
-const _ = require('lodash');
-
 let _cloudWatchLogsService = null;
 let _cloudFormationService = null;
 
@@ -56,9 +54,9 @@ class ServerlessCloudWatchLogsTagPlugin {
 
   tagCloudWatchLogs(data) {
 
-    const cloudWatchResources = _.filter(data.StackResources, { ResourceType: 'AWS::Logs::LogGroup' });
+    const cloudWatchResources = (data.StackResources || []).filter(item => { return item.ResourceType === 'AWS::Logs::LogGroup' });
 
-    const promises = _.map(cloudWatchResources, item => {
+    const promises = (cloudWatchResources || []).map(item => {
       return new Promise((resolve, reject) => {
 
         const params = {

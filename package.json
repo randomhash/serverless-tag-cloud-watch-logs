@@ -1,11 +1,11 @@
 {
-  "name": "serverless-tag-cloud-watch-logs",
+  "name": "serverless-tag-cloud-watch-log-groups",
   "version": "1.0.0",
   "description": "Serverless plugin to tag CloudWatchLogs",
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/gfragoso/serverless-tag-cloud-watch-logs"
+    "url": "https://github.com/randomhash/serverless-tag-cloud-watch-logs"
   },
   "keywords": [
     "serverless",
@@ -15,9 +15,7 @@
     "tag",
     "aws"
   ],
-  "author": "Gustavo Fragoso",
+  "author": "Gustavo Fragoso & randomhash",
   "license": "MIT",
-  "dependencies": {
-    "lodash": "^4.17.5"
-  }
+  "dependencies": {}
 }
