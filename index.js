@@ -28,6 +28,7 @@ class ServerlessCloudWatchLogsTagPlugin {
   constructor(serverless, options) {
 
     this.options = options;
+    this.resources = [];
     this.serverless = serverless;
     this.awsService = this.serverless.getProvider('aws');
 
@@ -50,27 +51,33 @@ class ServerlessCloudWatchLogsTagPlugin {
       this.cloudWatchLogsService.listStackResources({ StackName: this.stackName}, (err, data) => {
         console.log(data);
         if (err) return reject(err);
-        StackResources.push(...(data.StackResourceSummaries || []));
+        this.resources.push(...(data.StackResourceSummaries || []));
         if (data.NextToken) {
           console.log('Starting fetching pages')
           let token = data.NextToken;
-          while (token) {
-            console.log(token)
-            this.cloudWatchLogsService.listStackResources({ StackName: this.stackName, NextToken: token }, (err, data) => {
-              console.log(data);
-              if (err) return reject(err);
-              StackResources.push(...(data.StackResourceSummaries || []));
-              token = data.NextToken || 0
-            })
-          }
+          return this.getStackResourceWithToken({ StackName: this.stackName, NextToken: token })
         }
       });
       return resolve(StackResources)
     });
   }
 
-  tagCloudWatchLogs(data) {
+  getStackResourceWithToken(token)  {
+    return new Promise((resolve, reject) => {
+      console.log('Executing listStackResources by token ', token);
+      this.cloudWatchLogsService.listStackResources({ StackName: this.stackName, NextToken: token}, (err, data) => {
+        console.log(data);
+        if (err) return reject(err);
+        this.resources.push(...(data.StackResourceSummaries || []));
+        if (data.NextToken) {
+          return getStackResourceWithToken(data.NextToken);
+        }
+      });
+      return resolve(this.resources)
+    });
+  }
 
+  tagCloudWatchLogs(data) {
     const cloudWatchResources = (data).filter(item => { return item.ResourceType === 'AWS::Logs::LogGroup' });
 
     const promises = (cloudWatchResources).map(item => {
