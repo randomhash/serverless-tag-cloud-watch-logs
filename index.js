@@ -67,15 +67,15 @@ class ServerlessCloudWatchLogsTagPlugin {
       this.cloudWatchLogsService.listStackResources({ StackName: this.stackName, NextToken: token}, (err, data) => {
         if (!data) {
           console.log("No data to traverse");
-          resolveParent(this.resources);
+          return resolveParent(this.resources);
         }
         if (err) return reject(err);
         this.resources.push(...(data.StackResourceSummaries || []));
         if (data.NextToken) {
           return getStackResourceWithToken(data.NextToken, resolveParent);
         }
+        return resolveParent(this.resources)
       });
-      resolveParent(this.resources)
   }
 
   tagCloudWatchLogs() {
