@@ -66,7 +66,7 @@ class ServerlessCloudWatchLogsTagPlugin {
       this.cloudWatchLogsService.listStackResources({ StackName: this.stackName, NextToken: token}, (err, data) => {
         if (!data) {
           console.log("No data to traverse");
-          return resolve(this.resources);
+          resolve(this.resources);
         }
         if (err) return reject(err);
         this.resources.push(...(data.StackResourceSummaries || []));
@@ -74,7 +74,7 @@ class ServerlessCloudWatchLogsTagPlugin {
           return getStackResourceWithToken(data.NextToken);
         }
       });
-      return resolve(this.resources)
+      resolve(this.resources)
     });
   }
 
@@ -98,7 +98,10 @@ class ServerlessCloudWatchLogsTagPlugin {
       });
     });
 
-    return Promise.all(promises);
+    return Promise.all(promises).then((data) => {
+      console.log(data);
+      return data;
+    });
   }
 }
 
