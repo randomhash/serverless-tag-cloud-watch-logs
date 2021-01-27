@@ -47,14 +47,14 @@ class ServerlessCloudWatchLogsTagPlugin {
     return new Promise((resolve, reject) => {
       console.log('Executing listStackResources');
       const StackResources = [];
-      this.cloudWatchLogsService.listStackResources({ StackName: this.stackName, MaxItems: 9999 }, (err, data) => {
+      this.cloudWatchLogsService.listStackResources({ StackName: this.stackName}, (err, data) => {
         console.log(data);
         if (err) return reject(err);
         StackResources.push(...(data.StackResourceSummaries || []));
         if (data.NextToken) {
           let token = data.NextToken;
           while (token) {
-            this.cloudWatchLogsService.listStackResources({ StackName: this.stackName, StartingToken: token }, (err, data) => {
+            this.cloudWatchLogsService.listStackResources({ StackName: this.stackName, NextToken: token }, (err, data) => {
               console.log(data);
               if (err) return reject(err);
               StackResources.push(...(data.StackResourceSummaries || []));
@@ -69,7 +69,7 @@ class ServerlessCloudWatchLogsTagPlugin {
 
   tagCloudWatchLogs(data) {
 
-    const cloudWatchResources = (data.StackResourceSummaries || []).filter(item => { return item.ResourceType === 'AWS::Logs::LogGroup' });
+    const cloudWatchResources = (data).filter(item => { return item.ResourceType === 'AWS::Logs::LogGroup' });
 
     const promises = (cloudWatchResources).map(item => {
       return new Promise((resolve, reject) => {
