@@ -52,7 +52,6 @@ class ServerlessCloudWatchLogsTagPlugin {
         if (err) return reject(err);
         this.resources.push(...(data.StackResourceSummaries || []));
         if (data.NextToken) {
-          console.log('Starting fetching pages of resources...')
           return this.getStackResourceWithToken(data.NextToken, resolve, reject)
         }
         return resolve()
@@ -61,7 +60,6 @@ class ServerlessCloudWatchLogsTagPlugin {
   }
 
   getStackResourceWithToken(token, resolveParent, rejectParent)  {
-      console.log('Executing listStackResources by token ', token);
       this.cloudWatchLogsService.listStackResources({ StackName: this.stackName, NextToken: token}, (err, data) => {
         if (!data) {
           return resolveParent(this.resources);
