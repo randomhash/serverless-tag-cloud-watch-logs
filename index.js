@@ -67,7 +67,7 @@ class ServerlessCloudWatchLogsTagPlugin {
         if (err) return rejectParent(err);
         this.resources.push(...(data.StackResourceSummaries || []));
         if (data.NextToken) {
-          return getStackResourceWithToken(data.NextToken, resolveParent, rejectParent);
+          return this.getStackResourceWithToken(data.NextToken, resolveParent, rejectParent);
         }
         return resolveParent(this.resources)
       });
