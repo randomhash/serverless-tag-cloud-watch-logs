@@ -6,6 +6,10 @@ let _cloudFormationService = null;
 class ServerlessCloudWatchLogsTagPlugin {
 
   get stackName() {
+    if (this.serverless.provider.stackName) {
+      return this.serverless.provider.stackName;
+    }
+    
     return `${this.serverless.service.service}-${this.options.stage}`;
   }
 
