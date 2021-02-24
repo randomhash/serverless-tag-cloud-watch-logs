@@ -6,12 +6,9 @@ let _cloudFormationService = null;
 class ServerlessCloudWatchLogsTagPlugin {
 
   get stackName() {
-    console.log(`Getting stack name ${JSON.stringify(this.serverless.provider)}`)
-    if (this.serverless.provider.stackName) {
-      console.log(`Stack name: ${this.serverless.provider.stackName}`);
-      return this.serverless.provider.stackName;
+    if (this.serverless.configurationInput.provider.stackName) {
+      return this.serverless.configurationInput.provider.stackName;
     }
-    console.log('No stack name exists, proceeding with default')
     return `${this.serverless.service.service}-${this.options.stage}`;
   }
 
