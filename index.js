@@ -7,6 +7,7 @@ class ServerlessCloudWatchLogsTagPlugin {
 
   get stackName() {
     if (this.serverless.provider.stackName) {
+      console.log(this.serverless.provider.stackName);
       return this.serverless.provider.stackName;
     }
     
