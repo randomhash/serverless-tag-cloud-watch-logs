@@ -9,7 +9,6 @@ class ServerlessCloudWatchLogsTagPlugin {
     if (this.serverless.configurationInput.provider.stackName) {
       return this.serverless.configurationInput.provider.stackName;
     }
-    
     return `${this.serverless.service.service}-${this.options.stage}`;
   }
 
